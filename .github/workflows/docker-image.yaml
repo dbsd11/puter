@@ -39,5 +39,5 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}  
           password: ${{ secrets.DOCKER_PASSWORD }}  
       - name: Push Docker Image to aliyun docker registry   
-        run: docker push registry.cn-beijing.aliyuncs.com/dbsnolimit/browser-use-webui:latest
+        run: docker push registry.cn-hangzhou.aliyuncs.com/dbsnolimit/puter:latest
         timeout-minutes: 10
