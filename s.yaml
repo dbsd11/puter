@@ -1,0 +1,82 @@
+edition: 1.0.0          #  命令行YAML规范版本，遵循语义化版本（Semantic Versioning）规范
+name: framework         #  项目名称
+# access 是当前应用所需要的密钥信息配置：
+# 密钥配置可以参考：https://www.serverless-devs.com/serverless-devs/command/config
+# 密钥使用顺序可以参考：https://www.serverless-devs.com/serverless-devs/tool#密钥使用顺序与规范
+access: "{{ access }}"
+
+vars:
+  region: "cn-hangzhou" 
+  service_domain: ${env(service_domain)}
+  
+services:
+  puter: # 业务名称/模块名称
+    component:  fc    # 组件名称 https://docs.serverless-devs.com/user-guide/aliyun/fc/yaml/readme/
+    actions:          # 自定义执行逻辑
+      pre-deploy:
+        - run: set +e && echo "start deploy ${vars.service_domain} on $server.output.url.custom_domain[0].domain}"
+          path: "s.yaml"
+      post-deploy:  # 在deploy之后运行
+        - run: set +e && echo 'deploy success'
+          path: "s.yaml"
+    props: # 组件的属性值
+      region: ${vars.region}
+      service: 
+        name: "puter"
+        description: 'puter api server'
+        vpcConfig: auto
+        nasConfig:
+          userId: 1000
+          groupId: 1000
+          mountPoints:
+            - serverAddr: 03808482b2-nwn30.cn-hangzhou.nas.aliyuncs.com
+              nasDir: /puter/config
+              fcDir: /etc/puter
+            - serverAddr: 03808482b2-nwn30.cn-hangzhou.nas.aliyuncs.com
+              nasDir: /puter/data
+              fcDir: /var/puter
+      function:
+        name: "puter-api"
+        description: 'puter api'
+        version: 'LATEST'
+        codeUri: '.'
+        runtime: custom-container
+        timeout: 7200
+        caPort: 4100
+        customContainerConfig: 
+          image: "registry.cn-hangzhou.aliyuncs.com/dbsnolimit/puter:latest"
+        customHealthCheckConfig:
+          failureThreshold: 120
+          httpGetUrl: /
+          periodSeconds: 10
+          timeoutSeconds: 3
+          successThreshold: 1
+          initialDelaySeconds: 10
+        cpu: 4
+        memorySize: 4096 # 单位MB
+        diskSize: 512 # 单位MB
+        instanceConcurrency: 200
+        instanceType: c1 # 函数实例类型，可选值为：e1（弹性实例）、c1（性能实例）、fc.gpu.tesla.1（GPU实例）、fc.gpu.ampere.1 GPU实例）
+        logConfig:
+          project: 'serverless-log'
+          logstore: 'default'
+      triggers:
+        - name: httpTrigger
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - HEAD
+              - OPTIONS
+      customDomains:
+        - domainName: ${vars.service_domain}
+          protocol: HTTP
+          routeConfigs:
+            - path: /*
+              serviceName: puter
+              functionName: puter-api
+              qualifier: LATEST
