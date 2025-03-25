@@ -41,7 +41,7 @@ RUN npm cache clean --force && \
 RUN cd src/gui && npm run build && cd -
 
 ENV PUTER_ENV="dev"
-RUN cd src/puter-js && npm run build && cd -
+RUN cd src/puter-js && npm run start-webpack && cd -
 
 # Production stage
 FROM node:23.9-alpine
