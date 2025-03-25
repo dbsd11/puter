@@ -54,6 +54,7 @@ RUN apk add --no-cache git
 # Set up working directory
 RUN mkdir -p /opt/puter/app && mkdir -p /etc/puter && mkdir -p /var/puter
 WORKDIR /opt/puter/app
+RUN mkdir sdk && cp ./src/puter-js/dist/puter.dev.js sdk/ 
 
 # Copy built artifacts and necessary files from the build stage
 COPY --from=build /app/src/gui/dist ./dist
