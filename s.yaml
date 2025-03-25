@@ -82,3 +82,10 @@ services:
               serviceName: puter
               functionName: puter-api
               qualifier: LATEST
+        - domainName: api.${vars.service_domain}
+          protocol: HTTP
+          routeConfigs:
+            - path: /*
+              serviceName: puter
+              functionName: puter-api
+              qualifier: LATEST
