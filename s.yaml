@@ -26,8 +26,8 @@ services:
         description: 'puter api server'
         vpcConfig: auto
         nasConfig:
-          userId: 0
-          groupId: 0
+          userId: 1000
+          groupId: 1000
           mountPoints:
             - serverAddr: 03808482b2-nwn30.cn-hangzhou.nas.aliyuncs.com
               nasDir: /puter/config
@@ -49,7 +49,7 @@ services:
           args: '["-c", "\"ln -s /mnt/etc/puter/* /etc/puter/ && ln -s /mnt/var/puter/* /var/puter/ && npm start\""]' 
         customHealthCheckConfig:
           failureThreshold: 120
-          httpGetUrl: /
+          httpGetUrl: /test
           periodSeconds: 10
           timeoutSeconds: 3
           successThreshold: 1
