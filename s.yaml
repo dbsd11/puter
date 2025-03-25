@@ -52,10 +52,10 @@ services:
         customHealthCheckConfig:
           failureThreshold: 120
           httpGetUrl: /test
-          periodSeconds: 10
+          periodSeconds: 5
           timeoutSeconds: 3
           successThreshold: 1
-          initialDelaySeconds: 10
+          initialDelaySeconds: 5
         cpu: 4
         memorySize: 4096 # 单位MB
         diskSize: 512 # 单位MB
