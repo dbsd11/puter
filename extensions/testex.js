@@ -117,7 +117,7 @@ extension.on('core.puter-exec.submission.done', event => {
 });
 
 extension.on('core.request.measured', event => {
-    console.log('GOT REQUEST.MEASURED EVENT', event);
+    // console.log('GOT REQUEST.MEASURED EVENT', event);
 });
 
 extension.on('core.sns', event => {
