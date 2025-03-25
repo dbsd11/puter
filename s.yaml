@@ -31,10 +31,10 @@ services:
           mountPoints:
             - serverAddr: 03808482b2-nwn30.cn-hangzhou.nas.aliyuncs.com
               nasDir: /puter/config
-              fcDir: /etc/puter
+              fcDir: /mnt/etc/puter
             - serverAddr: 03808482b2-nwn30.cn-hangzhou.nas.aliyuncs.com
               nasDir: /puter/data
-              fcDir: /var/puter
+              fcDir: /mnt/var/puter
       function:
         name: "puter-api"
         description: 'puter api'
