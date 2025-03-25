@@ -41,7 +41,7 @@ RUN npm cache clean --force && \
 RUN cd src/gui && npm run build && cd -
 
 ENV PUTER_ENV="dev"
-RUN cd src/puter-js && npm run build && cd -
+RUN cd src/puter-js && npm run build && mkdir sdk && mv dist/puter.dev.js sdk/ && mv sdk ../../gui/dist/ && cd -
 
 # Production stage
 FROM node:23.9-alpine
@@ -55,9 +55,8 @@ LABEL version="1.2.46-beta-1"
 RUN apk add --no-cache git
 
 # Set up working directory
-RUN mkdir -p /opt/puter/app && mkdir /opt/puter/app/sdk && mkdir -p /etc/puter && mkdir -p /var/puter
+RUN mkdir -p /opt/puter/app && mkdir -p /etc/puter && mkdir -p /var/puter
 WORKDIR /opt/puter/app
-COPY --from=build /app/src/puter-js/dist/puter.dev.js ./sdk/ 
 
 # Copy built artifacts and necessary files from the build stage
 COPY --from=build /app/src/gui/dist ./dist
