@@ -45,7 +45,7 @@ services:
         caPort: 4100
         customContainerConfig: 
           image: "registry.cn-hangzhou.aliyuncs.com/dbsnolimit/puter:latest"
-          command: '["bash"]'
+          command: '["sh"]'
           args: '["-c", "\"ln -s /mnt/etc/puter/* /etc/puter/ && ln -s /mnt/var/puter/* /var/puter/ && npm start\""]' 
         customHealthCheckConfig:
           failureThreshold: 120
