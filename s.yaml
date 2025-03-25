@@ -8,6 +8,8 @@ access: "{{ access }}"
 vars:
   region: "cn-hangzhou" 
   service_domain: ${env(service_domain)}
+  cert_id: ${env(cert_id)}
+  api_cert_id: ${env(api_cert_id)}
   
 services:
   puter: # 业务名称/模块名称
@@ -76,14 +78,16 @@ services:
               - OPTIONS
       customDomains:
         - domainName: ${vars.service_domain}
-          protocol: HTTP
+          protocol: HTTP,HTTPS
+          certId: ${vars.cert_id}
           routeConfigs:
             - path: /*
               serviceName: puter
               functionName: puter-api
               qualifier: LATEST
         - domainName: api.${vars.service_domain}
-          protocol: HTTP
+          protocol: HTTP,HTTPS
+          certId: ${vars.api_cert_id}
           routeConfigs:
             - path: /*
               serviceName: puter
