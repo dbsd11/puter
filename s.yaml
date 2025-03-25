@@ -26,8 +26,8 @@ services:
         description: 'puter api server'
         vpcConfig: auto
         nasConfig:
-          userId: 1000
-          groupId: 1000
+          userId: 0
+          groupId: 0
           mountPoints:
             - serverAddr: 03808482b2-nwn30.cn-hangzhou.nas.aliyuncs.com
               nasDir: /puter/config
