@@ -46,14 +46,7 @@ services:
         customContainerConfig: 
           image: "registry.cn-hangzhou.aliyuncs.com/dbsnolimit/puter:latest"
           command: '["sh"]'
-          args: '["-c", "ln -s /mnt/etc/puter/* /etc/puter/ && ln -s /mnt/var/puter/* /var/puter/ && npm start"]' 
-        customHealthCheckConfig:
-          failureThreshold: 120
-          httpGetUrl: /test
-          periodSeconds: 10
-          timeoutSeconds: 3
-          successThreshold: 1
-          initialDelaySeconds: 10
+          args: '["-c", "ln -s /mnt/etc/puter/* /etc/puter/ && ln -s /mnt/var/puter/* /var/puter/ && npm start"]'
         cpu: 4
         memorySize: 4096 # 单位MB
         diskSize: 512 # 单位MB
