@@ -41,7 +41,7 @@ RUN npm cache clean --force && \
 RUN cd src/gui && npm run build && cd -
 
 ENV PUTER_ENV="dev"
-RUN cd src/puter-js && npm run build && mkdir sdk && mv dist/puter.dev.js sdk/ && mv sdk ../../gui/dist/ && cd -
+RUN cd src/puter-js && npm run build && mkdir dist/sdk && mv dist/puter.dev.js dist/sdk/ && cd -
 
 # Production stage
 FROM node:23.9-alpine
@@ -60,6 +60,7 @@ WORKDIR /opt/puter/app
 
 # Copy built artifacts and necessary files from the build stage
 COPY --from=build /app/src/gui/dist ./dist
+COPY --from=build /app/src/puter-js/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
 COPY . .
 
