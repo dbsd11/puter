@@ -50,7 +50,7 @@ services:
           command: '["sh"]'
           args: '["-c", "ln -s /mnt/etc/puter/* /etc/puter/ && ln -s /mnt/var/puter/* /var/puter/ && npm start"]'
         customHealthCheckConfig:
-          failureThreshold: 120
+          failureThreshold: 3
           httpGetUrl: /test
           periodSeconds: 5
           timeoutSeconds: 3
