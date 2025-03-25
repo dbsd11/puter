@@ -52,7 +52,7 @@ LABEL version="1.2.46-beta-1"
 RUN apk add --no-cache git
 
 # Set up working directory
-RUN mkdir -p /opt/puter/app
+RUN mkdir -p /opt/puter/app && mkdir -p /etc/puter && mkdir -p /var/puter
 WORKDIR /opt/puter/app
 
 # Copy built artifacts and necessary files from the build stage
@@ -61,7 +61,7 @@ COPY --from=build /app/node_modules ./node_modules
 COPY . .
 
 # Set permissions
-RUN chown -R node:node /opt/puter/app
+RUN chown -R node:node /opt/puter/app && chown -R node:node /etc/puter && chown -R node:node /var/puter
 USER node
 
 EXPOSE 4100
