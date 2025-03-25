@@ -157,7 +157,7 @@ async function build(options){
     // Copy index.js to dist/gui.js
     // Prepend `window.gui_env="prod";` to `./dist/gui.js`
     fs.writeFileSync(
-        path.join(__dirname, 'dist', 'gui.js'),
+        path.join(__dirname, 'dist', PUTER_ENV !== 'prod' ? 'gui.dev.js' : 'gui.js'),
         `window.gui_env="${PUTER_ENV}"; \n\n` + fs.readFileSync(path.join(__dirname, 'src', 'index.js'))
     );
 
