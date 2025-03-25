@@ -78,7 +78,8 @@ class AIChatService extends BaseService {
 
         const svc_event = this.services.get('event');
         svc_event.on('ai.prompt.report-usage', async (_, details) => {
-            if ( details.service_used === 'fake-chat' ) return;
+            // Only skip usage reporting for fake-chat if it's not using the costly model
+            if ( details.service_used === 'fake-chat' && details.model_used !== 'costly' ) return;
 
             const values = {
                 user_id: details.actor?.type?.user?.id,
@@ -662,11 +663,15 @@ class AIChatService extends BaseService {
         const reading = await svc_permission.scan(actor, `paid-services:ai-chat`);
         const options = PermissionUtil.reading_to_options(reading);
 
-        // Query current ai usage in terms of cost
+        // Query current ai usage in terms of cost (only from the past month)
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        const oneMonthAgoStr = oneMonthAgo.toISOString().slice(0, 19).replace('T', ' ');
+        
         const [row] = await this.db.read(
             'SELECT SUM(`cost`) AS sum FROM `ai_usage` ' +
-            'WHERE `user_id` = ?',
-            [actor.type.user.id]
+            'WHERE `user_id` = ? AND `created_at` >= ?',
+            [actor.type.user.id, oneMonthAgoStr]
         );
         
         const cost_used = row?.sum || 0;
