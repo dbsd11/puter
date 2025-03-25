@@ -66,7 +66,7 @@ app.use(express.static('./'));
 
 if(env === "prod"){
     // make sure to serve the ./dist/ folder maps to the root of the website
-    app.use(express.static('./dist/'));
+    app.use(express.static('../../dist/'));
 }
 
 if(env === "dev"){
