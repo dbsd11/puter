@@ -66,9 +66,6 @@ USER node
 
 EXPOSE 4100
 
-HEALTHCHECK --interval=30s --timeout=3s \
-    CMD wget --no-verbose --tries=1 --spider http://api.127.0.0.1.nip.io:4100/test || exit 1
-
 ENV NO_VAR_RUNTUME=1
 
 # Attempt to fix `lru-cache@11.0.2` missing after build stage
