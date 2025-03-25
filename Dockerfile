@@ -40,6 +40,9 @@ RUN npm cache clean --force && \
 # Run the build command if necessary
 RUN cd src/gui && npm run build && cd -
 
+ENV PUTER_ENV="dev"
+RUN cd src/puter-js && npm run build && cd -
+
 # Production stage
 FROM node:23.9-alpine
 
