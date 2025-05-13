@@ -49,7 +49,7 @@ services:
         customContainerConfig: 
           image: "registry.cn-hangzhou.aliyuncs.com/dbsnolimit/puter:latest"
           command: '["sh"]'
-          args: '["-c", "ln -s /mnt/etc/puter/* /etc/puter/ && ln -s /mnt/var/puter/* /var/puter/ && npm start"]'
+          args: '["-c", "ln -s /mnt/etc/puter/* /etc/puter/ && ln -s /mnt/etc/puter/.env /opt/puter/app/.env && ln -s /mnt/var/puter/* /var/puter/ && npm start"]'
         customHealthCheckConfig:
           failureThreshold: 6
           httpGetUrl: /test
