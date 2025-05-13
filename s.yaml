@@ -56,8 +56,8 @@ services:
           timeoutSeconds: 3
           successThreshold: 1
           initialDelaySeconds: 5
-        cpu: 4
-        memorySize: 4096 # 单位MB
+        cpu: 1
+        memorySize: 1024 # 单位MB
         diskSize: 512 # 单位MB
         instanceConcurrency: 200
         instanceType: c1 # 函数实例类型，可选值为：e1（弹性实例）、c1（性能实例）、fc.gpu.tesla.1（GPU实例）、fc.gpu.ampere.1 GPU实例）
