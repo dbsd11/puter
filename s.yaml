@@ -27,6 +27,7 @@ services:
         name: "puter"
         description: 'puter api server'
         vpcConfig: auto
+        logConfig: auto
         nasConfig:
           userId: 1000
           groupId: 1000
