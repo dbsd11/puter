@@ -51,6 +51,7 @@ class SqliteDatabaseAccessService extends BaseDatabaseAccessService {
         const do_setup = ! fs.existsSync(this.config.path);
 
         this.db = new Database(this.config.path);
+        this.db.pragma('journal_mode = WAL');
 
         const upgrade_files = [];
 

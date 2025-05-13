@@ -429,10 +429,10 @@ class WebServerService extends BaseService {
             // (bot client?) and express is handling this badly by
             // not setting the header at all. (that's my theory)
             if( req.hostname === undefined ) {
-                res.status(400).send(
-                    'Please verify your browser is up-to-date.'
-                );
-                return;
+                // res.status(400).send(
+                //     'Please verify your browser is up-to-date.'
+                // );
+                // return;
             }
 
             return next();
