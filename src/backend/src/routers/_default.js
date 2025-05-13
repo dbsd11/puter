@@ -393,7 +393,7 @@ router.all('*', async function(req, res, next) {
                     description: app_description || config.short_description,
                     short_description: app_description || config.short_description,
                     social_media_image: app_social_media_image || config.social_media_image,
-                    company: 'Puter Technologies Inc.',
+                    company: '',
                     canonical_url: canonical_url,
                     icon: app_icon,
                 }, launch_options);
