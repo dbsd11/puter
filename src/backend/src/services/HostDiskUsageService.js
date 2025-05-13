@@ -87,11 +87,13 @@ class HostDiskUsageService extends BaseService {
         const current_platform = process.platform;
 
         let disk_use = 0;
+
+        var mountpointConfig = process.env.mountpoint;
         if (current_platform == "darwin") {
-            const mountpoint = this.get_darwin_mountpoint(process.cwd());
+            const mountpoint = mountpointConfig || this.get_darwin_mountpoint(process.cwd());
             disk_use = this.get_disk_use_darwin(mountpoint);
         } else if (current_platform == "linux") {
-            const mountpoint = this.get_linux_mountpint(process.cwd());
+            const mountpoint = mountpointConfig || this.get_linux_mountpint(process.cwd());
             disk_use = this.get_disk_use_linux(mountpoint);
         } else if (current_platform == "win32") {
             this.log.warn('HostDiskUsageService: Windows is not supported yet');
