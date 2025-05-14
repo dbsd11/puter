@@ -250,6 +250,11 @@ module.exports = eggspress('/batch', {
         }
 
         const op_spec = pending_operations.shift();
+        let path = op_spec.path;
+        if (path.startsWith('~/')) {
+            path = `/${req.actor.type.user.username}/${path.substring(2)}`
+        }
+        op_spec.path = path;
         file.offset = op_spec.offset;
 
         // index in response_promises is first null value

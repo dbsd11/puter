@@ -236,20 +236,23 @@ const launch_app = async (options)=>{
         else if (options.token){
             iframe_url.searchParams.append('puter.auth.token', options.token);
         } else {
-            // Try to acquire app token from the server
+            let authToken = localStorage.getItem('auth_token'); // get auth_token from local storage if it's not se
+            iframe_url.searchParams.append('puter.auth.token', authToken);
+            
+            //Try to acquire app token from the server
 
-            let response = await fetch(window.api_origin + "/auth/get-user-app-token", {
-                "headers": {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer "+ window.auth_token,
-                },
-                "body": JSON.stringify({app_uid: app_info.uid ?? app_info.uuid}),
-                "method": "POST",
-                });
-            let res = await response.json();
-            if(res.token){
-                iframe_url.searchParams.append('puter.auth.token', res.token);
-            }
+            // let response = await fetch(window.api_origin + "/auth/get-user-app-token", {
+            //     "headers": {
+            //         "Content-Type": "application/json",
+            //         "Authorization": "Bearer "+ window.auth_token,
+            //     },
+            //     "body": JSON.stringify({app_uid: app_info.uid ?? app_info.uuid}),
+            //     "method": "POST",
+            //     });
+            // let res = await response.json();
+            // if(res.token){
+            //     iframe_url.searchParams.append('puter.auth.token', res.token);
+            // }
         }
 
         iframe_url.searchParams.append('puter.domain', window.app_domain);

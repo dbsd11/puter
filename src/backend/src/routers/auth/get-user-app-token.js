@@ -62,6 +62,7 @@ module.exports = eggspress('/auth/get-user-app-token', {
     }
 
     const svc_fs = x.get('services').get('filesystem');
+    console.log('actor.type.user.appdata_uuid = ', actor.type.user.appdata_uuid);
     const appdata_dir_sel = actor.type.user.appdata_uuid
         ? new NodeUIDSelector(actor.type.user.appdata_uuid)
         : new NodePathSelector(`/${actor.type.user.username}/AppData`);

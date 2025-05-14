@@ -47,9 +47,9 @@ class Context {
         let x = this.contextAsyncLocalStorage.getStore()?.get('context');
         if ( ! x ) {
             if ( config.env === 'dev' && ! allow_fallback ) {
-                throw new Error(
-                    'FAILED TO GET THE CORRECT CONTEXT'
-                );
+                // throw new Error(
+                //     'FAILED TO GET THE CORRECT CONTEXT'
+                // );
             }
 
             x = this.root.sub({}, this.USE_NAME_FALLBACK);

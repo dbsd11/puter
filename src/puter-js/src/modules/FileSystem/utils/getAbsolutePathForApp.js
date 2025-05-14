@@ -15,6 +15,10 @@ const getAbsolutePathForApp = (relativePath)=>{
         relativePath = path.join('~/AppData', puter.appID, relativePath);
     }
 
+    if (relativePath.startsWith('~/') ) {
+        relativePath = `/${window.user.username}/${relativePath.substring(2)}`;
+    }
+
     return relativePath;
 }
 

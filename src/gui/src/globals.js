@@ -97,7 +97,7 @@ try {
 if (window.user_preferences === null) {
     window.user_preferences = {
         show_hidden_files: false,
-        language: navigator.language.split("-")[0] || navigator.userLanguage || 'en',
+        language: navigator.language.split("-")[0] || navigator.userLanguage || 'zh',
         clock_visible: 'auto',
     }
 }

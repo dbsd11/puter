@@ -45,8 +45,8 @@ window.i18n = function (key, replacements = [], encode_html = true) {
         }
     }
 
-    let language = translations[window.locale] ?? translations['en'];
-    let str = language.dictionary[key] ?? translations['en'].dictionary[key];
+    let language = translations[window.locale] ?? translations['zh'];
+    let str = language.dictionary[key] ?? translations['zh'].dictionary[key];
     
     if (!str) {
         str = key;
