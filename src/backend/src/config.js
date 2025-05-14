@@ -25,11 +25,11 @@ let config = {};
 // Static defaults
 config.servers = [];
 
-config.disable_user_signup = false;
+config.disable_user_signup = true;
 config.default_user_group = '78b1b1dd-c959-44d2-b02c-8735671f9997';
 
 // Will disable the auto-generated temp users. If a user lands on the site, they will be required to sign up or log in.
-config.disable_temp_users = false;
+config.disable_temp_users = true;
 config.default_temp_group = 'b7220104-7905-4985-b996-649fdcdb3c8f';
 
 config.max_file_size = 100_000_000_000;
@@ -64,7 +64,7 @@ config.monitor = {
 };
 
 config.max_subdomains_per_user = 2000;
-config.storage_capacity = 1*1024*1024*1024;
+config.storage_capacity = 100*1024*1024*1024;
 config.static_hosting_domain = 'site.puter.localhost';
 
 // Storage limiting is set to false by default
@@ -78,9 +78,9 @@ config.app_max_icon_size = 5*1024*1024;
 
 config.defaultjs_asset_path = '../../';
 
-config.short_description = `Puter is a privacy-first personal cloud that houses all your files, apps, and games in one private and secure place, accessible from anywhere at any time.`;
-config.title = 'Puter';
-config.company = 'Puter Technologies Inc.';
+config.short_description = `Pcomputer is a privacy-first personal cloud that houses all your files, apps, and games in one private and secure place, accessible from anywhere at any time.`;
+config.title = 'PComputer';
+config.company = 'bison group';
 
 config.puter_hosted_data = {
     puter_versions: 'https://version.puter.site/puter_versions.json',

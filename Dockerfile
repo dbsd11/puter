@@ -60,7 +60,9 @@ WORKDIR /opt/puter/app
 
 # Copy built artifacts and necessary files from the build stage
 COPY --from=build /app/src/gui/dist ./dist
+COPY --from=build /app/src/gui/dist ./src/gui/dist
 COPY --from=build /app/src/puter-js/dist ./dist
+COPY --from=build /app/src/puter-js/dist ./src/puter-js/dist
 COPY --from=build /app/node_modules ./node_modules
 COPY . .
 
