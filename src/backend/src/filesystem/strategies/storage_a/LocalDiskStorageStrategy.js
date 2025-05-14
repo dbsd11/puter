@@ -30,6 +30,8 @@ class LocalDiskUploadStrategy extends BaseOperation {
 
         const { progress_tracker } = storage_api;
 
+        console.log('local disk write file ', file)
+
         if ( file.buffer ) {
             await this.parent.svc_localDiskStorage.store_buffer({
                 key: uid,
@@ -42,6 +44,7 @@ class LocalDiskUploadStrategy extends BaseOperation {
                 key: uid,
                 stream: file.stream,
                 size: file.size,
+                offset: file.offset,
                 on_progress: evt => {
                     progress_tracker.set_total(file.size);
                     progress_tracker.set(evt.uploaded);

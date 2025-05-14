@@ -250,6 +250,7 @@ module.exports = eggspress('/batch', {
         }
 
         const op_spec = pending_operations.shift();
+        file.offset = op_spec.offset;
 
         // index in response_promises is first null value
         const index = response_promises.findIndex(p => p === null);

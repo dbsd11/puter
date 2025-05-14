@@ -96,7 +96,7 @@ class LocalDiskStorageService extends BaseService {
     * @param {Function} [options.on_progress] - The callback function to track progress.
     * @returns {Promise} A promise that resolves when the stream is fully stored.
     */
-    async store_stream ({ key, size, stream, on_progress }) {
+    async store_stream ({ key, size, stream, offset, on_progress }) {
         const require = this.require;
         const fs = require('fs');
 
@@ -112,7 +112,10 @@ class LocalDiskStorageService extends BaseService {
         const writePromise = new TeePromise();
 
         const path = this._get_path(key);
-        const write_stream = fs.createWriteStream(path);
+        const write_stream = fs.createWriteStream(path, offset > 0 ? {
+            start: offset, // 从文件的第10个字节开始写入
+            flags: 'r+', // 确保文件以读写模式打开，以便我们可以修改文件内容
+          } : {});
         write_stream.on('error', () => writePromise.reject());
         write_stream.on('finish', () => writePromise.resolve());
 

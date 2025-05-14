@@ -170,7 +170,7 @@ const offset_write_stream = ({
 
     const original_stream_on_data = chunk => {
         console.log('original stream data', chunk.length, implied.state);
-        console.log('received from original:', chunk.toString());
+        // console.log('received from original:', chunk.toString());
 
         if ( implied.state === STATE_NEW_STREAM ) {
             console.warn('original stream is not paused');
@@ -183,7 +183,7 @@ const offset_write_stream = ({
             chunk.length >= remaining
         ) {
             defer_buffer = chunk.slice(remaining);
-            console.log('deferred:', defer_buffer.toString());
+            console.log('deferred:', defer_buffer.length);
             chunk = chunk.slice(0, remaining);
         }
 
@@ -193,11 +193,11 @@ const offset_write_stream = ({
         ) {
             const remaining_replacement = replace_length - replaced_bytes;
             if ( chunk.length <= remaining_replacement ) {
-                console.log('skipping chunk', chunk.toString());
+                console.log('skipping chunk');
                 replaced_bytes += chunk.length;
                 return; // skip the chunk
             }
-            console.log('skipping part of chunk', chunk.slice(0, remaining_replacement).toString());
+            console.log('skipping part of chunk', chunk.slice(0, remaining_replacement).length);
             chunk = chunk.slice(remaining_replacement);
 
             // `+= remaining_replacement` and `= replace_length` are equivalent
@@ -206,7 +206,7 @@ const offset_write_stream = ({
         }
 
         remaining -= chunk.length;
-        console.log('pushing from org stream:', chunk.toString());
+        console.log('pushing from org stream:', chunk.length);
         passThrough.push(chunk);
         implied.state;
     }
@@ -232,16 +232,16 @@ const offset_write_stream = ({
                 const remaining_replacement = replace_length - replaced_bytes;
                 if ( replaced_bytes < replace_length ) {
                     if ( defer_buffer.length <= remaining_replacement ) {
-                        console.log('skipping deferred', defer_buffer.toString());
+                        console.log('skipping deferred', defer_buffer.length);
                         replaced_bytes += defer_buffer.length;
                         defer_buffer = Buffer.alloc(0);
                     } else {
-                        console.log('skipping deferred', defer_buffer.slice(0, remaining_replacement).toString());
+                        console.log('skipping deferred', defer_buffer.slice(0, remaining_replacement).length);
                         defer_buffer = defer_buffer.slice(remaining_replacement);
                         replaced_bytes += remaining_replacement;
                     }
                 }
-                console.log('pushing deferred:', defer_buffer.toString());
+                console.log('pushing deferred:', defer_buffer.length);
                 passThrough.push(defer_buffer);
             }
             // originalDataStream.pipe(passThrough);
@@ -266,10 +266,10 @@ const offset_write_stream = ({
     })
 
     newDataStream.on('data', chunk => {
-        console.log('new stream data', chunk.toString());
+        console.log('new stream data', chunk.length);
 
         if ( implied.state === STATE_NEW_STREAM ) {
-            console.log('pushing from new stream', chunk.toString());
+            console.log('pushing from new stream', chunk.length);
             passThrough.push(chunk);
             return;
         }

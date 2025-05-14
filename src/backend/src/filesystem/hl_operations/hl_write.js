@@ -367,17 +367,17 @@ class HLWrite extends HLFilesystemOperation {
                 dst_size = values.offset + values.file.size;
             }
 
-            const ll_read = new LLRead();
-            const read_stream = await ll_read.run({
-                fsNode: destination,
-            });
+            // const ll_read = new LLRead();
+            // const read_stream = await ll_read.run({
+            //     fsNode: destination,
+            // });
 
-            values.file.stream = offset_write_stream({
-                originalDataStream: read_stream,
-                newDataStream: values.file.stream,
-                offset: values.offset,
-                replace_length,
-            });
+            // values.file.stream = offset_write_stream({
+            //     originalDataStream: read_stream,
+            //     newDataStream: values.file.stream,
+            //     offset: values.offset,
+            //     replace_length,
+            // });
             values.file.size = dst_size;
         }
 

@@ -22,9 +22,6 @@ const upload = async function(items, dirPath, options = {}){
             return reject(e);
         };
 
-        // xhr object to be used for the upload
-        let xhr = new XMLHttpRequest();
-
         // Can not write to root
         if(dirPath === '/')
             return error('Can not upload to root directory.');
@@ -37,17 +34,7 @@ const upload = async function(items, dirPath, options = {}){
         // This will be used to uniquely identify this operation and its progress
         // across servers and clients
         const operation_id = utils.uuidv4();
-
-        // Call 'init' callback if provided
-        // init is basically a hook that allows the user to get the operation ID and the XMLHttpRequest object
-        if(options.init && typeof options.init === 'function'){
-            options.init(operation_id, xhr);
-        }
-
-        // keeps track of the amount of data uploaded to the server
-        let bytes_uploaded_to_server = 0;
-        // keeps track of the amount of data uploaded to the cloud
-        let bytes_uploaded_to_cloud = 0;
+        const socket_id = this.socket.id;
 
         // This will hold the normalized entries to be uploaded
         // Since 'items' could be a DataTransferItemList, FileList, File, or an array of any of these,
@@ -198,9 +185,6 @@ const upload = async function(items, dirPath, options = {}){
         // total size of the upload is doubled because we will be uploading the files to the server
         // and then the server will upload them to the cloud
         total_size = total_size * 2;
-
-        // holds the data to be sent to the server
-        const fd = new FormData();
     
         //-------------------------------------------------
         // Generate the requests to create all the 
@@ -248,121 +232,220 @@ const upload = async function(items, dirPath, options = {}){
         // inverse mkdir_requests so that the root folder is created first
         // and then go down the tree
         mkdir_requests.reverse();
-    
-        fd.append('operation_id', operation_id);
-        fd.append('socket_id', this.socket.id);
-        fd.append('original_client_socket_id', this.socket.id);
 
-        // Append mkdir operations to upload request
-        for(let i=0; i<mkdir_requests.length; i++){
-            fd.append('operation', JSON.stringify(mkdir_requests[i]));          
+        // ------------- begin prepare upload -----------------
+        let xhrList = []
+        let uploadedItems = []
+        // init is basically a hook that allows the user to get the operation ID and the XMLHttpRequest object
+        if(options.init && Object.prototype.toString.call(options.init) === '[object AsyncFunction]'){
+            let defaultXhr = new XMLHttpRequest();
+            defaultXhr.onabort = () => {
+                for(xhr in xhrList) {
+                    try {
+                        xhr.abort()
+                    } catch (e) {
+                    }
+                }
+            };
+            await options.init(operation_id, defaultXhr);
         }
-    
-        // Append file metadata to upload request
-        if(!options.shortcutTo){
-            for(let i=0; i<files.length; i++){
-                fd.append('fileinfo', JSON.stringify({
-                    name: files[i].name,
-                    type: files[i].type,
-                    size: files[i].size,
-                }));
+
+        // mkdir
+        if(mkdir_requests.length > 0) {
+            await createXhrPromise(options, (xhr) => {
+                xhrList.push(xhr)
+                // holds the data to be sent to the server
+                const fd = new FormData();
+            
+                fd.append('operation_id', operation_id);
+                fd.append('socket_id', socket_id);
+                fd.append('original_client_socket_id', socket_id);
+
+                // Append mkdir operations to upload request
+                for(let i=0; i<mkdir_requests.length; i++) {
+                    fd.append('operation', JSON.stringify(mkdir_requests[i]));          
+                }
+                // open request to server
+                xhr.open("post",(this.APIOrigin +'/batch'), true);
+                // set auth header
+                xhr.setRequestHeader("Authorization", "Bearer " + this.authToken);
+                xhr.send(fd);
+            });
+        }
+        // ------------- end prepare upload -----------------
+
+        // ------------- begin upload -----------------
+
+        // Fire off the 'start' event
+        if(options.start && typeof options.start === 'function'){
+            await options.start();
+        }
+
+        if (options.shortcutTo) {
+            await createXhrPromise(options, (xhr) => {
+                xhrList.push(xhr)
+                // holds the data to be sent to the server
+                const fd = new FormData();
+            
+                fd.append('operation_id', operation_id);
+                fd.append('socket_id', socket_id);
+                fd.append('original_client_socket_id', socket_id);
+
+                // Append write operations for each file
+                for(let i=0; i<files.length; i++) {
+                    fd.append('operation', JSON.stringify({
+                        op: 'shortcut',
+                        dedupe_name: options.dedupeName ?? true,
+                        overwrite: options.overwrite ?? false,
+                        create_missing_ancestors: (options.createMissingAncestors ||  options.createMissingParents),
+                        operation_id: operation_id,
+                        path: (
+                            files[i].puter_path_param &&
+                            path.dirname(files[i].puter_path_param ?? '')
+                        ) || (
+                            files[i].filepath &&
+                            path.join(dirPath, path.dirname(files[i].filepath))
+                        ) || '',
+                        name: path.basename(files[i].filepath),
+                        item_upload_id: i,
+                        shortcut_to: options.shortcutTo,
+                        shortcut_to_uid: options.shortcutTo,
+                        app_uid: options.appUID,
+                    }));
+                }
+
+                // open request to server
+                xhr.open("post",(this.APIOrigin +'/batch'), true);
+                // set auth header
+                xhr.setRequestHeader("Authorization", "Bearer " + this.authToken);
+                // send request
+                xhr.send(fd);
+            });
+        } else {
+            // keeps track of the amount of data uploaded to the server
+            let bytes_uploaded_to_server = 0;
+            // keeps track of the amount of data uploaded to the cloud
+            let bytes_uploaded_to_cloud = 0;
+
+            const progress_handler = (msg) => {
+                if(msg.operation_id !== operation_id){
+                    return
+                }
+                if(msg.loaded_diff){
+                    bytes_uploaded_to_cloud += msg.loaded_diff;
+                    bytes_uploaded_to_server += msg.loaded_diff;
+                }
             }
-        }
-        // Append write operations for each file
-        for(let i=0; i<files.length; i++){
-            fd.append('operation', JSON.stringify({
-                op: options.shortcutTo ? 'shortcut' : 'write',
-                dedupe_name: options.dedupeName ?? true,
-                overwrite: options.overwrite ?? false,
-                create_missing_ancestors: (options.createMissingAncestors ||  options.createMissingParents),
-                operation_id: operation_id,
-                path: (
-                    files[i].puter_path_param &&
-                    path.dirname(files[i].puter_path_param ?? '')
-                ) || (
-                    files[i].filepath &&
-                    path.join(dirPath, path.dirname(files[i].filepath))
-                ) || '',
-                name: path.basename(files[i].filepath),
-                item_upload_id: i,
-                shortcut_to: options.shortcutTo,
-                shortcut_to_uid: options.shortcutTo,
-                app_uid: options.appUID,
-            }));
-        }
-        
-        // Append files to upload
-        if(!options.shortcutTo){
-            for(let i=0; i<files.length; i++){
-                fd.append('file', files[i] ?? '');
+
+            // Handle upload progress events from server
+            this.socket.on('upload.progress', progress_handler);
+
+            // -----------------------------------------------
+            // Upload progress: server -> cloud
+            // the following code will check the progress of the upload every 100ms
+            // -----------------------------------------------
+            let cloud_progress_check_interval = setInterval(function() {
+                // operation progress
+                let op_progress = ((bytes_uploaded_to_cloud + bytes_uploaded_to_server)/total_size * 100).toFixed(2);
+
+                op_progress = op_progress > 100 ? 100 : op_progress;
+                if(options.progress && typeof options.progress === 'function')
+                    options.progress(operation_id, op_progress);
+            }, 100);
+
+            for(let i=0; i<files.length; i++) {
+                let fileChunks = [];
+                let chunkSize = 1024 * 1024 * 10; // 10 MB
+                let fileSize = files[i].size;
+                let numChunks = Math.ceil(fileSize / chunkSize);
+                for (let j = 0; j < numChunks; j++) {
+                    let start = j * chunkSize;
+                    let end = Math.min(start + chunkSize, fileSize);
+                    let chunk = files[i].slice(start, end);
+                    fileChunks.push(chunk);
+                }
+                
+                for (let j = 0; j < fileChunks.length; j++) {
+                    let uploadSuccess = true;
+                    let uploadedItem = await createXhrPromise(options, (xhr) => {
+                        xhrList.push(xhr)
+                        // holds the data to be sent to the server
+                        const fd = new FormData();
+                    
+                        fd.append('operation_id', operation_id);
+                        fd.append('socket_id', socket_id);
+                        fd.append('original_client_socket_id', socket_id);
+                        fd.append('fileinfo', JSON.stringify({
+                            name: files[i].name,
+                            type: files[i].type,
+                            size: fileChunks[j].size,
+                        }));
+                        fd.append('operation', JSON.stringify({
+                            op: 'write',
+                            dedupe_name: false,
+                            overwrite: true,
+                            create_missing_ancestors: (options.createMissingAncestors ||  options.createMissingParents),
+                            operation_id: operation_id,
+                            path: (
+                                files[i].puter_path_param &&
+                                path.dirname(files[i].puter_path_param ?? '')
+                            ) || (
+                                files[i].filepath &&
+                                path.join(dirPath, path.dirname(files[i].filepath))
+                            ) || '',
+                            name: path.basename(files[i].filepath),
+                            item_upload_id: i * 10000 + j,
+                            app_uid: options.appUID,
+                            ... j == 0 ? {} : {
+                                offset: j * chunkSize,
+                            }
+                        }));
+                        fd.append('file', fileChunks[j] ?? '');
+                        // open request to server
+                        xhr.open("post",(this.APIOrigin +'/batch'), true);
+                        // set auth header
+                        xhr.setRequestHeader("Authorization", "Bearer " + this.authToken);
+                        // send request
+                        xhr.send(fd);
+                    }).catch(e => {
+                        error(e)
+                        uploadSuccess = false;
+                    })
+                    if (!uploadSuccess) {
+                        console.log('upload failed for file: ' + files[i].name + " chunk: "+ j);
+                        break;
+                    } else {
+                        uploadedItems.push(...uploadedItem);
+                    }
+                }
             }
-        }
-    
-        const progress_handler = (msg) => {
-            if(msg.operation_id === operation_id){
-                bytes_uploaded_to_cloud += msg.loaded_diff
+
+            // stop the cloud upload progress tracker
+            clearInterval(cloud_progress_check_interval);
+
+            // remove progress handler
+            this.socket.off('upload.progress', progress_handler);
+
+            // if success callback is provided, call it
+            if(options.success && typeof options.success === 'function'){
+                options.success(uploadedItems);
             }
+            resolve(uploadedItems)
         }
+    })
+}
 
-        // Handle upload progress events from server
-        this.socket.on('upload.progress', progress_handler);
+function createXhrPromise(options, processXhr){
+    return new Promise((resolve, reject) => {
+        let xhr = new XMLHttpRequest();
 
-        // keeps track of the amount of data uploaded to the server
-        let previous_chunk_uploaded = null;
-    
-        // open request to server
-        xhr.open("post",(this.APIOrigin +'/batch'), true);
-        // set auth header
-        xhr.setRequestHeader("Authorization", "Bearer " + this.authToken);
-
-        // -----------------------------------------------
-        // Upload progress: client -> server
-        // -----------------------------------------------
-        xhr.upload.addEventListener('progress', function(e){
-            // update operation tracker
-            let chunk_uploaded;
-            if(previous_chunk_uploaded === null){
-                chunk_uploaded = e.loaded;
-                previous_chunk_uploaded = 0;
-            }else{
-                chunk_uploaded = e.loaded - previous_chunk_uploaded;
-            }
-            previous_chunk_uploaded += chunk_uploaded;
-            bytes_uploaded_to_server += chunk_uploaded;
-
-            // overall operation progress
-            let op_progress = ((bytes_uploaded_to_cloud + bytes_uploaded_to_server)/total_size * 100).toFixed(2);
-            op_progress = op_progress > 100 ? 100 : op_progress;
-
-            // progress callback function
-            if(options.progress && typeof options.progress === 'function')
-                options.progress(operation_id, op_progress);
-        })
-    
-        // -----------------------------------------------
-        // Upload progress: server -> cloud
-        // the following code will check the progress of the upload every 100ms
-        // -----------------------------------------------
-        let cloud_progress_check_interval = setInterval(function() {
-            // operation progress
-            let op_progress = ((bytes_uploaded_to_cloud + bytes_uploaded_to_server)/total_size * 100).toFixed(2);
-    
-            op_progress = op_progress > 100 ? 100 : op_progress;
-            if(options.progress && typeof options.progress === 'function')
-                options.progress(operation_id, op_progress);
-        }, 100);
-    
         // -----------------------------------------------
         // onabort
         // -----------------------------------------------
-        xhr.onabort = ()=>{
-            // stop the cloud upload progress tracker
-            clearInterval(cloud_progress_check_interval);
-            // remove progress handler
-            this.socket.off('upload.progress', progress_handler);
+        xhr.onabort = ()=> {
             // if an 'abort' callback is provided, call it
             if(options.abort && typeof options.abort === 'function')
-                options.abort(operation_id);
+                options.abort(operation_id, xhr);
         }
 
         // -----------------------------------------------
@@ -373,12 +456,6 @@ const upload = async function(items, dirPath, options = {}){
                 const resp = await utils.parseResponse(xhr);
                 // Error 
                 if((xhr.status >= 400 && xhr.status < 600) || (options.strict && xhr.status === 218)) {
-                    // stop the cloud upload progress tracker
-                    clearInterval(cloud_progress_check_interval);
-
-                    // remove progress handler
-                    this.socket.off('upload.progress', progress_handler);
-
                     // If this is a 'strict' upload (i.e. status code is 218), we need to find out which operation failed 
                     // and call the error callback with that operation.
                     if(options.strict && xhr.status === 218){
@@ -390,10 +467,9 @@ const upload = async function(items, dirPath, options = {}){
                                 break;
                             }
                         }
-                        return error(failed_operation);
+                        reject(failed_operation)
                     }
-
-                    return error(resp);
+                    reject(resp)
                 }
                 // Success
                 else{
@@ -402,31 +478,15 @@ const upload = async function(items, dirPath, options = {}){
                         if(puter.debugMode)
                             console.log('no results');
                     }
-    
+
                     let items = resp.results;
-                    items = items.length === 1 ? items[0] : items;
-
-                    // if success callback is provided, call it
-                    if(options.success && typeof options.success === 'function'){
-                        options.success(items);
-                    }
-                    // stop the cloud upload progress tracker
-                    clearInterval(cloud_progress_check_interval);
-                    // remove progress handler
-                    this.socket.off('upload.progress', progress_handler);
-
-                    return resolve(items);
+                    items = items.length === 1 ? [items[0]] : items;
+                    resolve(items)
                 }
             }
         }
-    
-        // Fire off the 'start' event
-        if(options.start && typeof options.start === 'function'){
-            options.start();
-        }
 
-        // send request
-        xhr.send(fd);
+        processXhr(xhr);
     })
 }
 
