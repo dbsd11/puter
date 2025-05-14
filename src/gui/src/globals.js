@@ -256,7 +256,7 @@ window.reset_item_positions = true; // The variable decides if the item position
 window.file_templates = []
 
 // default language
-window.locale = 'en';
+window.locale = 'zh';
 
 /* Menubar style
  * 'window' - menubar is part of the window

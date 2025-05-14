@@ -305,11 +305,11 @@ class PuterDialog extends HTMLElement {
                             </ul>
                             <p class="help-text">If you're not familiar with these options, consider reaching out to your development team or IT support for assistance.</p>
                         </div>
-                        <p style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px; text-align: center; font-size:13px;">
+                        <!-- <p style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px; text-align: center; font-size:13px;">
                             <a href="https://docs.puter.com" target="_blank">Docs</a><span style="margin:10px; color: #CCC;">|</span>
                             <a href="https://github.com/heyPuter/puter/" target="_blank">Github</a><span style="margin:10px; color: #CCC;">|</span>
-                            <a href="https://discord.com/invite/PQcx7Teh8u" target="_blank">Discord</a>
-                        </p>
+                            <a href="https://discord.com/invite/PQcx7Teh8u" target="_blank">Discord</a> 
+                        </p> -->
                     </div>
                 </dialog>`;
         }else{

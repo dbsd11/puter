@@ -1170,7 +1170,7 @@ async function UIDesktop(options) {
     }
 
     // github
-    ht += `<a href="https://github.com/HeyPuter/puter" target="_blank" class="toolbar-btn" title="GitHub" style="background-image:url(${window.icons['logo-github-white.svg']});"></a>`;
+    // ht += `<a href="https://github.com/HeyPuter/puter" target="_blank" class="toolbar-btn" title="GitHub" style="background-image:url(${window.icons['logo-github-white.svg']});"></a>`;
 
     // do not show the fullscreen button on mobile devices since it's broken
     if (!isMobile.phone) {

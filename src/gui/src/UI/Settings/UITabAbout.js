@@ -27,11 +27,11 @@ export default {
             <div class="about-container">
                 <div class="about">
                     <a href="https://puter.com" target="_blank" class="logo"><img src="/images/logo.png"></a>
-                    <p class="description">${i18n('puter_description')}</p>
+                    <!-- <p class="description">${i18n('puter_description')}</p> -->
                     <p class="links">
-                        <a href="mailto:hey@puter.com" target="_blank">hey@puter.com</a>
+                        <a href="mailto:bitdbsd11@163.com" target="_blank">send mail to bitdbsd11@163.com</a>
                         <span style="color: #CCC;">•</span>
-                        <a href="https://docs.puter.com" target="_blank">${i18n('developers')}</a>
+                        <!-- <a href="https://docs.puter.com" target="_blank">${i18n('developers')}</a>
                         <span style="color: #CCC;">•</span>
                         <a href="https://status.puter.com" target="_blank">${i18n('status')}</a>
                         <span style="color: #CCC;">•</span>
@@ -39,9 +39,9 @@ export default {
                         <span style="color: #CCC;">•</span>
                         <a href="https://puter.com/privacy" target="_blank">${i18n('privacy')}</a>
                         <span style="color: #CCC;">•</span>
-                        <a href="#" class="show-credits">${i18n('credits')}</a>
+                        <a href="#" class="show-credits">${i18n('credits')}</a> -->
                     </p>
-                    <div class="social-links">
+                    <!-- <div class="social-links">
                         <a href="https://twitter.com/HeyPuter/" target="_blank">
                             <svg viewBox="0 0 24 24" aria-hidden="true" style="opacity: 0.7;"><g><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></g></svg>
                         </a>
@@ -63,7 +63,7 @@ export default {
                                 </g>
                             </svg>
                         </a>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="version"></div>
     

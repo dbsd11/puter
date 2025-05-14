@@ -37,8 +37,8 @@ async function UIWindowWelcome(options){
             h += `<div class="welcome-window-footer">`;
                 h += `<a href="/terms" target="_blank">Terms</a>`;
                 h += `<a href="/privacy" style="margin-left: 20px;" target="_blank">Privacy</a>`;
-                h += `<a href="https://developer.puter.com" style="margin-left: 20px;" target="_blank">Developers</a>`;
-                h += `<a href="https://github.com/heyputer/puter" style="margin-left: 20px;" target="_blank">Open Source</a>`;
+                // h += `<a href="https://developer.puter.com" style="margin-left: 20px;" target="_blank">Developers</a>`;
+                // h += `<a href="https://github.com/heyputer/puter" style="margin-left: 20px;" target="_blank">Open Source</a>`;
             h += `</div>`;
         h += `</div>`;
     h += `</div>`;
