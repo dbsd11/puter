@@ -59,7 +59,7 @@ services:
           timeoutSeconds: 3
           successThreshold: 1
           initialDelaySeconds: 5
-        cpu: 2
+        cpu: 1
         memorySize: 2048 # 单位MB
         diskSize: 512 # 单位MB
         instanceConcurrency: 200
