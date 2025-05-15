@@ -68,7 +68,7 @@ COPY . .
 
 # Set permissions
 RUN chown -R node:node /opt/puter/app && chown -R node:node /etc/puter && chown -R node:node /var/puter
-USER node
+USER root
 
 EXPOSE 4100
 
