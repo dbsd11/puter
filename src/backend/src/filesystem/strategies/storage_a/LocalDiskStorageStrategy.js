@@ -108,8 +108,9 @@ class LocalDiskStorageStrategy {
         return new LocalDiskDeleteStrategy(this);
     }
 
-    async create_read_stream (uid) {
-        return await this.svc_localDiskStorage.create_read_stream({ key: uid });
+    async create_read_stream (uid, res) {
+        res = res ?? {};
+        return await this.svc_localDiskStorage.create_read_stream({ key: uid , start: res.start, end: res.end});
     }
 }
 

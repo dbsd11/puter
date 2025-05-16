@@ -39,23 +39,32 @@ router.post('/down', express.json(), express.urlencoded({ extended: true }), con
     }
 
     // check if user is verified
-    if((config.strict_email_verification_required || req.user.requires_email_confirmation) && !req.user.email_confirmed)
+    if((config.strict_email_verification_required || req.user.requires_email_confirmation) && !req.user.email_confirmed) {
+        console.log('account is not verified');
         return res.status(400).send({code: 'account_is_not_verified', message: 'Account is not verified'});
+    }
 
     // check anti-csrf token
     const svc_antiCSRF = req.services.get('anti-csrf');
     if ( ! svc_antiCSRF.consume_token(req.user.uuid, req.body.anti_csrf) ) {
+        console.log('incorrect anti-CSRF token');
         return res.status(400).json({ message: 'incorrect anti-CSRF token' });
     }
 
     // validation
-    if(!req.query.path)
+    if(!req.query.path) {
+        console.log('path is required');
         return res.status(400).send('path is required')
+    }
     // path must be a string
-    else if (typeof req.query.path !== 'string')
+    else if (typeof req.query.path !== 'string') {
+        console.log('path must be a string.');
         return res.status(400).send('path must be a string.')
-    else if(req.query.path.trim() === '')
+    }
+    else if(req.query.path.trim() === '') {
+        console.log('path cannot be empty');
         return res.status(400).send('path cannot be empty')
+    }
 
     // modules
     const db = req.services.get('database').get(DB_WRITE, 'filesystem');
@@ -65,8 +74,10 @@ router.post('/down', express.json(), express.urlencoded({ extended: true }), con
     const AWS        = require('aws-sdk');
 
     // cannot download the root, because it's a directory!
-    if(path === '/')
+    if(path === '/') {
+        console.log('Cannot download the root.');
         return res.status(400).send('Cannot download a directory.');
+    }
 
     // resolve path to its FSEntry
     const svc_fs = req.services.get('filesystem');
@@ -74,6 +85,7 @@ router.post('/down', express.json(), express.urlencoded({ extended: true }), con
 
     // not found
     if( ! fsnode.exists() ) {
+        console.log('File not found');
         return res.status(404).send('File not found');
     }
 
@@ -85,11 +97,15 @@ router.post('/down', express.json(), express.urlencoded({ extended: true }), con
         res.setHeader('Content-Type', 'application/octet-stream');
         res.attachment(await fsnode.get('name'));
 
+        let size = await fsnode.fetchSize();
+        res.setHeader('Content-Length', size);
+
         const hl_read = new HLRead();
         const stream = await hl_read.run({
             fsNode: fsnode,
             user: req.user,
         });
+
         // let stream = await s3.getObject({
         //     Bucket: fsentry.bucket,
         //     Key: fsentry.uuid, // File name you want to save as in S3

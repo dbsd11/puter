@@ -28,6 +28,7 @@ const fs = require('fs');
 const auth = require('../../middleware/auth.js');
 const measure = require('../../middleware/measure.js');
 const { surrounding_box, es_import_promise } = require('../../fun/dev-console-ui-utils.js');
+const { subdomain } = require('../../helpers.js');
 
 const relative_require = require;
 const strutil = require('@heyputer/putility').libs.string;
@@ -596,6 +597,10 @@ class WebServerService extends BaseService {
 
             // Request headers to allow
             res.header("Access-Control-Allow-Headers", allowed_headers.join(', '));
+
+            if (req.hostname && subdomain(req) !== 'api') {
+                res.setHeader('Cache-Control', 'max-age=60');
+            }
 
             // Set to true if you need the website to include cookies in the requests sent
             // to the API (e.g. in case you use sessions)

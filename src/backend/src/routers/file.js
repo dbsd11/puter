@@ -19,7 +19,7 @@
 "use strict"
 const express = require('express');
 const router = new express.Router();
-const {validate_signature_auth, get_url_from_req, get_descendants, id2path, get_user, sign_file} = require('../helpers');
+const {validate_signature_auth, get_url_from_req, get_descendants, id2path, get_user, sign_file, subdomain } = require('../helpers');
 const { DB_WRITE } = require('../services/database/consts');
 const { Context } = require('../util/context');
 
@@ -28,7 +28,7 @@ const { Context } = require('../util/context');
 // -----------------------------------------------------------------------//
 router.get('/file', async (req, res, next)=>{
     // check subdomain
-    if(require('../helpers').subdomain(req) !== 'api')
+    if(subdomain(req) !== 'api')
         next();
 
     // validate URL signature
@@ -117,8 +117,10 @@ router.get('/file', async (req, res, next)=>{
     //--------------------------------------------------
     if (!range) {
         // set content-type, if available
-        if(contentType !== null)
+        if(contentType !== null) {
             res.setHeader('Content-Type', contentType);
+        }
+        res.setHeader('Content-Length', fsentry[0].size);
 
         const storage = req.ctx.get('storage');
 
@@ -180,6 +182,7 @@ router.get('/file', async (req, res, next)=>{
             headers["Content-Type"] = contentType;
 
         // HTTP Status 206 for Partial Content
+        // res.writeHead(206, headers);
         res.writeHead(206, headers);
 
         try{
@@ -187,6 +190,8 @@ router.get('/file', async (req, res, next)=>{
             let stream = await storage.create_read_stream(fsentry[0].uuid, {
                 bucket: fsentry[0].bucket,
                 bucket_region: fsentry[0].bucket_region,
+                start: start,
+                end: end + 1,
             });
             return stream.pipe(res);
         }catch(e){

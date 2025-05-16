@@ -48,7 +48,7 @@ const download = function(options){
         let item_download_progress = batch_download_progress[options.item_upload_id];
 
         let xhr = new XMLHttpRequest();
-        xhr.open("post", (window.api_origin + '/download'), true);
+        xhr.open("post", (window.api_origin + '/down'), true);
         xhr.setRequestHeader("Authorization", "Bearer " + window.auth_token);
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 

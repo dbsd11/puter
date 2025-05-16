@@ -151,12 +151,16 @@ class LocalDiskStorageService extends BaseService {
     * @param {string} options.key - The key for which to create the read stream.
     * @returns {stream.Readable} The read stream for the given key.
     */
-    async create_read_stream ({ key }) {
+    async create_read_stream ({ key, start, end }) {
         const require = this.require;
         const fs = require('fs');
 
         const path = this._get_path(key);
-        return fs.createReadStream(path);
+        return fs.createReadStream(path, (start !== null && end !== null) ? {
+            start: start,
+            end: end,
+            highWaterMark: 1024
+        } : {});
     }
 
 

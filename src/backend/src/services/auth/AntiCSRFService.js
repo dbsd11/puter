@@ -55,13 +55,18 @@ class CircularQueue {
     }
 
     maybe_consume (item) {
-        if ( this.has(item) ) {
-            const index = this.map.get(item);
-            this.map.delete(item);
-            this.queue[index] = null;
-            return true;
+        if ( !this.has(item) ) {
+            return false;
         }
-        return false;
+        
+        // support use twice for the same item
+        const index = this.map.get(item);
+        if (this.queue[index] === item) {
+            this.queue[index] = null
+        } else {
+            this.map.delete(item);
+        }
+        return true;
     }
 }
 
