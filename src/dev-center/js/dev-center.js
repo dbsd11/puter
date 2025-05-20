@@ -500,7 +500,7 @@ function generate_edit_app_section(app) {
                 <img class="app-icon" data-uid="${html_encode(app.uid)}" src="${html_encode(!app.icon ? './img/app.svg' : app.icon)}">
                 <h3 class="app-title" data-uid="${html_encode(app.uid)}">${html_encode(app.title)}${app.metadata?.locked ? lock_svg_tippy : ''}</h3>
                 <div style="margin-top: 4px; margin-bottom: 4px;">
-                    <span class="open-app-btn" data-app-uid="${html_encode(app.uid)}" data-app-name="${html_encode(app.name)}">Open</span>
+                    <span class="open-app-btn" data-app-uid="${html_encode(app.uid)}" data-app-name="${html_encode(app.name)}" data-app-index-url="${app.index_url}">Open</span>
                     <span style="margin: 5px; opacity: 0.3;">&bull;</span>
                     <span class="add-app-to-desktop" data-app-uid="${html_encode(app.uid)}" data-app-title="${html_encode(app.title)}">Add Shortcut to Desktop</span>
                     <span style="margin: 5px; opacity: 0.3;">&bull;</span>
@@ -1424,7 +1424,8 @@ $(document).on('click', '.edit-app-reset-btn', function () {
 });
 
 $(document).on('click', '.open-app-btn', async function (e) {
-    puter.ui.launchApp($(this).attr('data-app-name'))
+    // puter.ui.launchApp($(this).attr('data-app-name'))
+    window.open($(this).attr('data-app-index-url'));
 })
 
 $('#earn-money-c2a-close').click(async function (e) {
@@ -1685,7 +1686,7 @@ function generate_app_card(app) {
     h += `<div style="" class="app-row-toolbar disable-user-select">`;
 
     // Open
-    h += `<span title="Open app" class="open-app-btn" data-app-uid="${html_encode(app.uid)}" data-app-name="${html_encode(app.name)}" style="">Open</span>`;
+    h += `<span title="Open app" class="open-app-btn" data-app-uid="${html_encode(app.uid)}" data-app-name="${html_encode(app.name)}" data-app-index-url="${app.index_url}"  style="">Open</span>`;
     h += `<span style="margin-right: 10px; margin-left: 10px; color: #CCC; cursor:default;">&bull;</span>`;
 
     // Settings
